@@ -32,9 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Aspose.Pdf, Version=17.7.0.0, Culture=neutral, PublicKeyToken=716fcc553a201e56, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Aspose\Aspose.Pdf for .NET\Bin\net4.0\Aspose.Pdf.dll</HintPath>
+    <Reference Include="Aspose.PDF, Version=19.2.0.0, Culture=neutral, PublicKeyToken=716fcc553a201e56, processorArchitecture=MSIL">
+      <HintPath>packages\Aspose.PDF.19.2.0\lib\net4.0\Aspose.PDF.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -51,10 +50,12 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\PdfWriter.cs" />
+    <Compile Include="Utilities\TextFileEncodingDetector.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
     <None Include="App.config" />
+    <None Include="packages.config" />
     <None Include="readme.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

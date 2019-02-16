@@ -17,20 +17,31 @@ namespace Txt2Pdf
     {
         static void Main(string[] args)
         {
-            ////The text file 
-            string filePath = @"C:\Export\110689.txt";
-            string outputPath = @"C:\Export\export.pdf";
-
+            if (args == null || args.Length != 2)
+            {
+                printHelp();
+                return;
+            }
 
             // Create a new PdfWriter
             PdfWriter pdfWriter = new PdfWriter(900.0f, 1190.0f, 20.0f, 12.0f);
 
             //Write to a PDF format file
-            pdfWriter.Write(filePath, outputPath);
+            Console.WriteLine("Converting...");
+            try
+            {
+                int r = pdfWriter.Convert(args[0], args[1]);
+                Console.WriteLine(r == 0 ? "Successful completion." : "Failed.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(string.Format("Failed: {0}", ex.ToString()));
+            }
+        }
 
-
-
-
+        private static void printHelp()
+        {
+            Console.WriteLine("usage: Txt2Pdf inFilename outFilename");
         }
     }
 

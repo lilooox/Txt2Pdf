@@ -70,7 +70,66 @@ namespace Txt2Pdf.Utilities
         public FileStream outFileStream;
 
 
-        private Encoding encoding = Encoding.GetEncoding("gb2312");
+        //private Encoding encoding = Encoding.GetEncoding("gb2312");
+        private Encoding outEncoding = Encoding.GetEncoding("gb2312");
+        public Encoding GetFileEncodeType(string filename)
+        {
+            System.IO.FileStream fs = new System.IO.FileStream(filename, System.IO.FileMode.Open, System.IO.FileAccess.Read);
+            System.IO.BinaryReader br = new System.IO.BinaryReader(fs);
+            Byte[] buffer = br.ReadBytes(2);
+            if (buffer[0] >= 0xEF)
+            {
+                if (buffer[0] == 0xEF && buffer[1] == 0xBB)
+                {
+                    return System.Text.Encoding.UTF8;
+                }
+                else if (buffer[0] == 0xFE && buffer[1] == 0xFF)
+                {
+                    return System.Text.Encoding.BigEndianUnicode;
+                }
+                else if (buffer[0] == 0xFF && buffer[1] == 0xFE)
+                {
+                    return System.Text.Encoding.Unicode;
+                }
+                else
+                {
+                    return System.Text.Encoding.Default;
+                }
+            }
+            else
+            {
+                int len = (int)fs.Length;
+                byte[] bs = new byte[len];
+                fs.Position = 0;
+                fs.Read(bs, 0, len);
+                if (IsUTF8(bs))
+                {
+                    return Encoding.UTF8;
+                }
+                else
+                {
+                    return System.Text.Encoding.Default;
+                }
+            }
+        }
+
+        public static bool IsUTF8(byte[] values)
+        {
+            string stringValue = Encoding.UTF8.GetString(values);
+            byte[] newValues = Encoding.UTF8.GetBytes(stringValue);
+            if (values.Length != newValues.Length)
+            {
+                return false;
+            }
+            for (int i = 0; i < values.Length; i++)
+            {
+                if (values[i] != newValues[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
 
         public PdfWriter(float width, float depth, float margin, float lead)
         {
@@ -90,9 +149,9 @@ namespace Txt2Pdf.Utilities
         /// <summary>
         /// Write
         /// </summary>
-        public int Write(string filePath, string outputFilePath)
+        public int Convert(string inFilename, string outFilename)
         {
-            outFileStream = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write);
+            outFileStream = new FileStream(outFilename, FileMode.Create, FileAccess.Write);
 
             int i, catalog_id, font_id;
 
@@ -102,7 +161,8 @@ namespace Txt2Pdf.Utilities
             //Increment pageTreeID
             pageTreeID = objectID++;
 
-            StreamReader sr = new StreamReader(filePath, encoding);
+            Encoding encoding = GetFileEncodeType(inFilename);//TextFileEncodingDetector.DetectTextFileEncoding(inFilename, Encoding.Default);//
+            StreamReader sr = new StreamReader(inFilename, encoding);
 
             //Invoke the DoText function
             DoText(sr);
@@ -492,14 +552,8 @@ namespace Txt2Pdf.Utilities
         private void FileStreamWrite(FileStream outFileStream, string str1)
         {
             Byte[] buffer = null;
-            buffer = encoding.GetBytes(str1);
+            buffer = outEncoding.GetBytes(str1);
             outFileStream.Write(buffer, 0, buffer.Length);
-
         }
-
-
     }
-
-
-
 }
